@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercato Live | Transferts Foot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+    <header>
+        <div class="status-badge">Live Transfer Window 2026</div>
+        <h1>Mercato Live</h1>
+        <p class="subtitle">Suivez les plus gros transferts en temps réel</p>
+    </header>
+
+    <div id="loading">Recherche des dernières rumeurs...</div>
+    <div id="players-grid"></div>
+
+    <script>
+        const grid = document.getElementById('players-grid');
+        const loading = document.getElementById('loading');
+
+        fetch('http://localhost:3000/api/mercato')
+            .then(response => {
+                if (!response.ok) throw new Error('Erreur réseau');
+                return response.json();
+            })
+            .then(data => {
+                loading.style.display = 'none';
+                grid.innerHTML = data.map(p => `
+                    <div class="player-card">
+                        <div class="status-badge">Confirmé</div>
+                        <span class="player-name">${p.name}</span>
+                        <div class="player-club">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                            ${p.club}
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(err => {
+                loading.style.display = 'none';
+                grid.innerHTML = `<div id="error">Impossible de récupérer les transferts. Vérifiez que le backend est lancé.</div>`;
+            });
+    </script>
+</body>
+</html>
